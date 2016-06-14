@@ -1,0 +1,9 @@
+{% if tenants_list %}
+    <ul>
+    {% for tenant in tenants_list %}
+        <li><a href="{% url 'oslayer:tenant_detail' tenant.id %}">{{ tenant.name }} : {{ tenant.description }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No tenants are available.</p>
+{% endif %}

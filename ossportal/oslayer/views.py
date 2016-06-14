@@ -1,7 +1,7 @@
-#from django.shortcuts import render
 from django.http import HttpResponse
+from django.shortcuts import render
 
-from openstack import KeystoneClientFactory
+from openstack import api
 from inspect import Arguments
 # Create your views here.
 
@@ -9,18 +9,25 @@ from inspect import Arguments
 def index(request):
     return HttpResponse("Hello, world. You're at the oslayer index.")
 
-def projects(request):
-    kcf = KeystoneClientFactory()
-    kc = kcf.create_client()
-    return HttpResponse("Projects: ", kc.projects.list())
+def tenants(request):
+    """Lists current tenants available in OpenSTack."""
+    try:
+        kcf = api.KeystoneClientFactory()
+        kc = kcf.create_client()
+    except Exception, Arguments:
+        return HttpResponse("Error: %s".format(Arguments))
+    else:
+        
+        return render(request, 'oslayer/tenants.html', {'tenants_list': kc.projects.list()})
+        
+def tenant_detail(request, tenant_id):
+    """Shows details for a given tenant id"""    
     
-#     try:
-#         kc = KeystoneClientFactory()
-#     except Exception, Arguments:
-#         return HttpResponse("Error: %s".format(Arguments))
-#     else:
-#         return HttpResponse("Projects: ", kc.projects.list())
-#         for p in kc.projects.list():
-#             print p.name + ':' + p.description
-    
+    try:
+        kcf = api.KeystoneClientFactory()
+        kc = kcf.create_client()
+    except Exception, Arguments:
+        return HttpResponse("Error: %s".format(Arguments))
+    else:
+        return render(request, 'oslayer/tenant_detail.html', {'tenant': kc.projects.get(tenant_id)})
     
