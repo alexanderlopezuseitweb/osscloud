@@ -1,0 +1,9 @@
+{% if projects_list %}
+    <ul>
+    {% for project in projects_list %}
+        <li><a href="{% url 'oslayer:project_detail' project.id %}">{{ project.name }} : {{ project.description }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No projects are available.</p>
+{% endif %}

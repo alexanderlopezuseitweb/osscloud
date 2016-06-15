@@ -6,7 +6,8 @@ from .apps import OSLayerConfig
 
 # Create your models here.
 class User(models.Model):
-    """Login accesses for people related to an account in order to work in projects."""
+    """Login accesses for people related to an account in order to work in projects.
+    """
     id = models.AutoField(primary_key=True, help_text="User ID sequence.")
     name = models.CharField(max_length=45, help_text="Name to identify the user.")
     email = models.CharField(max_length=45, help_text="Contact e-mail.")
@@ -27,7 +28,8 @@ class User(models.Model):
         db_table = OSLayerConfig.name + "_users"
 
 class AuditInfo(models.Model):
-    """Common fields to models intended to be used to audit transactions on records."""
+    """Common fields to models intended to be used to audit transactions on records.
+    """
     created_on = models.DateTimeField(auto_now_add=True, help_text="Date of creation.")
     created_by = models.ForeignKey(User, related_name='+', help_text="User who created the record.")
     modified_on = models.DateTimeField(auto_now=True, help_text="Date of last modification.")
@@ -37,7 +39,8 @@ class AuditInfo(models.Model):
         abstract = True
 
 class AccessLevel(models.Model):
-    """Access levels to company records for users."""
+    """Access levels to company records for users.
+    """
     id = models.AutoField(primary_key=True, help_text="Access Level ID sequence.")
     name = models.CharField(max_length=45, help_text="Name to identify the access level.")
 
@@ -48,7 +51,8 @@ class AccessLevel(models.Model):
         db_table = OSLayerConfig.name + "_access_levels"
 
 class Company(AuditInfo):
-    """Entity to be billed for products and services."""
+    """Entity to be billed for products and services.
+    """
     id = models.AutoField(primary_key=True, help_text="Company ID sequence.")
     name = models.CharField(max_length=45, help_text="Company name or Customer.")
     description = models.CharField(max_length=500, blank=True, help_text="Short description of company or customer.")
@@ -73,7 +77,8 @@ class Company(AuditInfo):
         db_table = OSLayerConfig.name + "_companies"
         
 class Setting(models.Model):
-    """Configuration settings"""
+    """Configuration settings.
+    """
     id = models.CharField(max_length=20, primary_key=True, help_text="Setting ID Key.")
     description = models.TextField(max_length=500, blank=True, help_text="Short description of how this setting works.")
     value = models.CharField(max_length=100, help_text="String value for this setting.")

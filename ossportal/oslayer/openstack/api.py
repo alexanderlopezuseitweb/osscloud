@@ -5,38 +5,56 @@ from keystoneauth1.exceptions.http import Unauthorized
 
 from oslayer.models import Setting
 
+SESSION_KEYWORD = 'keystone_session'
+"""str: keyword to store and retrieve the Keystone connection 
+settings dictionary from Django session.
+"""
+
 class KeystoneClientFactory:
-    """Factory for OpenStack Keystone Authentication client."""
-    sess = None
-        
+    """Factory for OpenStack Keystone Authentication client.
+    """
+    
     def __init__(self):
-        """Sets authorization credentials to start a new session as admin user in Openstack Keystone."""
-        # Load connection credentials from settings database  
-        cs = self.__loadSettings__()
-        auth = v3.Password(auth_url=cs['auth_url'],
-                            username=cs['username'], 
-                            password=cs['password'], 
-                            project_name=cs['project_name'],
-                            user_domain_name=cs['user_domain_name'],
-                            project_domain_id=cs['project_domain_id'])
-        # Set session with authorization credentials 
-        self.sess = session.Session(auth=auth)
+        """Sets authorization credentials to start a new session as admin user in Openstack Keystone.
+        """
+        pass
         
-    def create_client(self):
-        """Creates the new keystone client."""
+    def create_client(self, connection_settings):
+        """Creates the new keystone client.
+        
+        Args:
+            connection_settings (dict): Connection settings from the database.
+        Returns:
+            Keystone client
+        """
+        # Load connection credentials from settings database  
+        auth = v3.Password(auth_url=connection_settings['auth_url'],
+                            username=connection_settings['username'], 
+                            password=connection_settings['password'], 
+                            project_name=connection_settings['project_name'],
+                            user_domain_name=connection_settings['user_domain_name'],
+                            project_domain_id=connection_settings['project_domain_id'])
+        # Set session with authorization credentials 
+        keystone_session = session.Session(auth=auth)
         # Set Keystone client based on session
-        keystoneClient = client.Client(session=self.sess)
+        keystoneClient = client.Client(session=keystone_session)
         # Validate that the Keystone client is working.
         try:
             headers = keystoneClient.session.get_auth_headers()  # @UnusedVariable
-        except Unauthorized, Argument: 
+        except Unauthorized, ex: 
             keystoneClient = None
-            raise "Authentication failed", Argument
+            raise "Authentication failed: " + str(ex)
         
         return keystoneClient
     
-    def __loadSettings__(self):
-        """Loads settings values from database."""
+    def load_settings(self):
+        """Loads settings values from database.
+        
+        Args:
+        
+        Returns:
+            Dictionary with the connection settings from the database
+        """
         # Define settings values with configuration from database
         connection_settings = {'auth_url':Setting.objects.get(id='auth_url').value,
                             'username':Setting.objects.get(id='username').value, 
