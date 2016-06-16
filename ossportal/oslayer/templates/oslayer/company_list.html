@@ -1,0 +1,19 @@
+
+<h2>Add new company</h2>
+<form action="{% url 'oslayer:company-add' %}" method="post">
+	{% csrf_token %}
+    {{ form.as_table }}
+    <input type="submit" value="Create" />
+</form>
+
+<h2>Existing companies</h2>
+
+{% if company_list %}
+    <ul>
+    {% for company in company_list %}
+        <li><a href="{% url 'oslayer:company_detail' company.id %}">{{ company.name }} : {{ company.description }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No companies are available.</p>
+{% endif %}

@@ -1,0 +1,37 @@
+<h2>New user</h2>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'oslayer:create_user' %}" method="post">
+	{% csrf_token %}
+	<label>Name:</label><input type="text" name="name" /><br/>
+	<label>Password:</label><input type="text" name="password" /><br/>
+	<label>Email:</label><input type="text" name="email" /><br/>
+	<label>Description:</label><input type="text" name="description" /><br/>
+	<label>Domain:</label>
+	<select name="domain_id">
+	{% for domain in domains_list %}
+	    <option value="{{ domain.id }}" />{{ domain.name }} : {{ domain.description }}</option>
+	{% endfor %}
+	</select><br/>
+	<label>Default project:</label>
+	<select name="default_project_id">
+	{% for project in projects_list %}
+	    <option value="{{ project.id }}" />{{ project.name }} : {{ project.description }}</option>
+	{% endfor %}
+	</select><br/>
+	<input type="submit" value="Crear" />
+</form>
+
+
+<h2>Existing users</h2>
+
+{% if users_list %}
+    <ul>
+    {% for user in users_list %}
+        <li><a href="{% url 'oslayer:user_detail' user.id %}">{{ user.name }} : {{ user.description }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No users are available.</p>
+{% endif %}

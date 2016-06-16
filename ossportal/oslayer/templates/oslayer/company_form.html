@@ -1,0 +1,6 @@
+<h2>Add new company</h2>
+<form action="{% url 'oslayer:company-add' %}" method="post">
+	{% csrf_token %}
+    {{ form.as_table }}
+    <input type="submit" value="Create" />
+</form>

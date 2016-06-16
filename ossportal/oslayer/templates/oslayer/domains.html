@@ -1,0 +1,9 @@
+{% if domains_list %}
+    <ul>
+    {% for domain in domains_list %}
+        <li><a href="{% url 'oslayer:domain_detail' domain.id %}">{{ domain.name }} : {{ domain.description }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No domains are available.</p>
+{% endif %}
