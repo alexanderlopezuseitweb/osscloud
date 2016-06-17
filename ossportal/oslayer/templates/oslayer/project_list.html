@@ -1,6 +1,10 @@
-{% if projects_list %}
+<form action="{% url 'oslayer:project_add' %}" method="get">
+	<input type="submit" value="Add" />
+</form>
+
+{% if project_list %}
     <ul>
-    {% for project in projects_list %}
+    {% for project in project_list %}
         <li><a href="{% url 'oslayer:project_detail' project.id %}">{{ project.name }} : {{ project.description }}</a></li>
     {% endfor %}
     </ul>

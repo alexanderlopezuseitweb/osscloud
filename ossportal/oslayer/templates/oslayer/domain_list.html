@@ -1,6 +1,11 @@
-{% if domains_list %}
+
+<form action="{% url 'oslayer:domain_add' %}" method="get">
+	<input type="submit" value="Add" />
+</form>
+
+{% if domain_list %}
     <ul>
-    {% for domain in domains_list %}
+    {% for domain in domain_list %}
         <li><a href="{% url 'oslayer:domain_detail' domain.id %}">{{ domain.name }} : {{ domain.description }}</a></li>
     {% endfor %}
     </ul>

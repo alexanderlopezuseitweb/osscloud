@@ -1,0 +1,18 @@
+<h2>New user</h2>
+
+<form action="{% url 'oslayer:user_add' %}" method="get">
+	<input type="submit" value="Crear" />
+</form>
+
+
+<h2>Existing users</h2>
+
+{% if user_list %}
+    <ul>
+    {% for user in user_list %}
+        <li><a href="{% url 'oslayer:user_detail' user.id %}">{{ user.name }} : {{ user.description }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No users are available.</p>
+{% endif %}
