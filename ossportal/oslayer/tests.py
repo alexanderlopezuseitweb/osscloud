@@ -11,12 +11,12 @@ class OpenStackTests(TestCase):
         """Create connection settings to be used in further tests.
         """
         TestCase.setUp(self)
-        Setting.objects.create(id='auth_url', value='http://192.168.1.58:5000/v3')
-        Setting.objects.create(id='username', value='ossportal')
-        Setting.objects.create(id='password', value='ossportal1')
-        Setting.objects.create(id='project_name', value='admin')
-        Setting.objects.create(id='user_domain_name', value='default')
-        Setting.objects.create(id='project_domain_id', value='default')
+        Setting.objects.add(id='auth_url', value='http://192.168.1.58:5000/v3')
+        Setting.objects.add(id='username', value='ossportal')
+        Setting.objects.add(id='password', value='ossportal1')
+        Setting.objects.add(id='project_name', value='admin')
+        Setting.objects.add(id='user_domain_name', value='default')
+        Setting.objects.add(id='project_domain_id', value='default')
         kcf = api.KeystoneClientFactory()
         connection_settings = kcf.load_settings()
         self.ks_client = kcf.create_client(connection_settings)
@@ -42,7 +42,7 @@ class OpenStackTests(TestCase):
     def test_create_tenant(self):
         """A new tenant must be created.
         """
-        self.ks_client.projects.create(name='test_tenant', domain='default', description='This is a test from oslayer.')
+        self.ks_client.projects.add(name='test_tenant', domain='default', description='This is a test from oslayer.')
         ten = None
         for t in self.ks_client.projects.list():
             if t.name == 'test_tenant':

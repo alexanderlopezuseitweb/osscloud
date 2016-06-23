@@ -12,8 +12,8 @@ class User(models.Model):
     name = models.CharField(max_length=45, help_text="Name to identify the user.")
     email = models.CharField(max_length=45, help_text="Contact e-mail.")
     password = models.CharField(max_length=45, blank=True, help_text="Password set by the user.")
-    security_question = models.CharField(max_length=100, help_text="Security question to be used on the event of password lose or user ID lose.")   
-    security_question_answer = models.CharField(max_length=100, 
+    security_question = models.CharField(max_length=100, blank=True, help_text="Security question to be used on the event of password lose or user ID lose.")   
+    security_question_answer = models.CharField(max_length=100, blank=True, 
                                                 help_text="Answer to the security question to be used on the event of password lose or user ID lose.")    
     created_on = models.DateTimeField(help_text="Date of creation.")
     is_confirmed = models.BooleanField(default=False, help_text="Whether the user is confirmed or not. Default is FALSE.")

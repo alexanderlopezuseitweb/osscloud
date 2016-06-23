@@ -6,7 +6,10 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView,\
     FormView
 
 from .models import Company
-from forms import AddCompanyForm, AddDomainForm, AddProjectForm, AddUserForm
+from services import company
+from services import domain
+from services import user
+from services import project
 from openstack import api
 # Create your views here.
 
@@ -80,18 +83,18 @@ def project_add(request):
     # if this is a POST request, process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = AddProjectForm(request.POST)
+        form = project.AddProjectForm(request.POST)
         form.set_choices(keystone_client)
         # check whether it is valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            form.request_openstack_creation(keystone_client)
+            project.add(keystone_client, form.cleaned_data)
             # redirect to a new URL:
             return render(request, 'oslayer/project_list.html', {'project_list': keystone_client.projects.list()})
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = AddProjectForm()
+        form = project.AddProjectForm()
         form.set_choices(keystone_client)
 
     return render(request, 'oslayer/project_form.html', {'form': form})
@@ -141,19 +144,18 @@ def user_add(request):
     # if this is a POST request, process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = AddUserForm(request.POST)
+        form = user.AddUserForm(request.POST)
         form.set_choices(keystone_client)
         # check whether it is valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            keystone_client = __get_keystone_client__(request)
-            form.request_openstack_creation(keystone_client)
+            user.add(keystone_client, form.cleaned_data)
             # redirect to a new URL:
             return render(request, 'oslayer/user_list.html', {'user_list': keystone_client.users.list()})
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = AddUserForm()
+        form = user.AddUserForm()
         form.set_choices(keystone_client)
 
     return render(request, 'oslayer/user_form.html', {'form': form})    
@@ -200,26 +202,49 @@ def domain_add(request):
     # if this is a POST request, process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = AddDomainForm(request.POST)
+        form = domain.AddDomainForm(request.POST)
         # check whether it is valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
             keystone_client = __get_keystone_client__(request)
-            form.request_openstack_creation(keystone_client)
+            domain.add(keystone_client, form.cleaned_data)
             # redirect to a new URL:
             return render(request, 'oslayer/domain_list.html', {'domain_list': keystone_client.domains.list()})
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = AddDomainForm()
+        form = domain.AddDomainForm()
 
     return render(request, 'oslayer/domain_form.html', {'form': form})
+
+def company_add(request):
+    """Form to create a new company record.
     
+    Args:
+        request: Django request containing session and data from post.
+    """
+    # if this is a POST request, process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = company.AddCompanyForm(request.POST)
+        # check whether it is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            keystone_client = __get_keystone_client__(request)
+            form._request_openstack_creation(keystone_client)
+            # redirect to a new URL:
+            return render(request, 'oslayer/company_list.html', {'company_list': keystone_client.companies.list()})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = company.AddCompanyForm()
+
+    return render(request, 'oslayer/company_form.html', {'form': form})
+
 class CompanyListView(generic.ListView):
     """Lists current companies.
     """
     model = Company
-    form_class = AddCompanyForm
 
 class CompanyDetailView(generic.DetailView):
     """Shows details for a given company.
@@ -227,9 +252,10 @@ class CompanyDetailView(generic.DetailView):
     model = Company
     template_name = 'oslayer/company_detail.html'
     
+    
 class CompanyCreate(CreateView):
     model = Company
-    fields = ['name', 'description', 'active', 'contact_address', 'billing_contact_name', 'billing_contact_email', 'billing_contact_phone', 'technical_contact_name', 'technical_contact_email']
+    fields = ['name', 'description', 'active']
 
 class CompanyUpdate(UpdateView):
     model = Company
