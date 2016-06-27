@@ -9,6 +9,18 @@ SESSION_KEYWORD = 'keystone_session'
 """str: keyword to store and retrieve the Keystone connection 
 settings dictionary from Django session.
 """
+DEFAULT_PASSWORD_SETTING = 'default_password'
+"""str: keyword to retrieve the default password for new users 
+created automatically.
+"""
+DEFAULT_PROJECT_ID_SETTING = 'default_project_id'
+"""str: keyword to retrive the id of the default project for new
+users created automatically.
+"""
+DEFAULT_ACCESS_LEVEL = 'default_access_level'
+"""str: keyword to retrieve the name of the default access level 
+for new companies.
+"""
 
 class KeystoneClientFactory:
     """Factory for OpenStack Keystone Authentication client.
@@ -63,3 +75,13 @@ class KeystoneClientFactory:
                             'user_domain_name':Setting.objects.get(id='user_domain_name').value,
                             'project_domain_id':Setting.objects.get(id='project_domain_id').value}
         return connection_settings
+    
+def get_setting(setting_key):
+    """Gets the setting value of _setting_key_ from the database.
+    
+    Args:
+        setting_key: (str) Key of the setting stored in the database.
+    Returns:
+        value (str) recovered from the database for the given setting key.
+    """
+    return Setting.objects.get(id=setting_key).value

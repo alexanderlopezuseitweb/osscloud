@@ -30,7 +30,7 @@ class User(models.Model):
 class AuditInfo(models.Model):
     """Common fields to models intended to be used to audit transactions on records.
     """
-    created_on = models.DateTimeField(auto_now_add=True, help_text="Date of creation.")
+    created_on = models.DateTimeField(auto_now_add=False, help_text="Date of creation.")
     created_by = models.ForeignKey(User, related_name='+', help_text="User who created the record.")
     modified_on = models.DateTimeField(auto_now=True, help_text="Date of last modification.")
     modified_by = models.ForeignKey(User, related_name='+', help_text="User who last updated the record.")

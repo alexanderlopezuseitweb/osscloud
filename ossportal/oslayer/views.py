@@ -1,9 +1,8 @@
-from django.http import HttpResponseRedirect, HttpResponse
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.http import HttpResponse
+from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render
 from django.views import generic
-from django.views.generic.edit import CreateView, UpdateView, DeleteView,\
-    FormView
+from django.views.generic.edit import UpdateView, DeleteView
 
 from .models import Company
 from services import company
@@ -231,9 +230,9 @@ def company_add(request):
         if form.is_valid():
             # process the data in form.cleaned_data as required
             keystone_client = __get_keystone_client__(request)
-            form._request_openstack_creation(keystone_client)
+            form.save(keystone_client)
             # redirect to a new URL:
-            return render(request, 'oslayer/company_list.html', {'company_list': keystone_client.companies.list()})
+            return render(request, 'oslayer/company_list.html', {'company_list': Company.objects.all()})
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -251,11 +250,7 @@ class CompanyDetailView(generic.DetailView):
     """
     model = Company
     template_name = 'oslayer/company_detail.html'
-    
-    
-class CompanyCreate(CreateView):
-    model = Company
-    fields = ['name', 'description', 'active']
+
 
 class CompanyUpdate(UpdateView):
     model = Company
