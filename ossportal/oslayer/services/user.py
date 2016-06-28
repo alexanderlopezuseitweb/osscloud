@@ -1,7 +1,20 @@
-from datetime import datetime
+import sys
+from django.utils import timezone
 from django import forms
 
 from oslayer.models import User, Company
+
+class IllegalDeletion(Exception):
+    """Exception when an attempt to delete an user is not consistent
+    with the business logic.
+    """
+    def __init__(self, reason):
+        """Instantiate a new object IllegalException.
+        
+        Args:
+            reason: (str) Explanation for the exception.
+        """
+        super(Exception, self).__init__(reason) 
 
 def add(keystone_client, fields_data):
     """Attempts the creation in Openstack and then in the local database model.
@@ -23,36 +36,43 @@ def add(keystone_client, fields_data):
 
     try:
         new_user = keystone_client.users.create(name=name, description=description, enabled=enabled, domain=domain_id, 
-                                     default_project=default_project_id, password=password, email=email,
-                                     account_main_user=account_main_user )
+                                     default_project=default_project_id, password=password, email=email)
     except Exception as ex:
-        raise Exception("Error: " + ex.type_name() + " - " + ex.message)
+        exc_type, exc_obj, exc_tb = sys.exc_info() #@UnusedVariable
+        raise Exception("Error: " + str(exc_type) + " - " + ex.message)
     else:
         #Successful creation in OpenStack, proceed to local model 
-        return User.objects.create(name=name, password=password, email=email, created_on=datetime.now(), 
-                            account_main_user=False, external_id=new_user.id)
+        return User.objects.create(name=name, password=password, email=email, created_on=timezone.now(),
+                                     account_main_user=account_main_user , external_id=new_user.id)
 
 def delete(keystone_client, user_id):
     """Request the company elimination from openstack through the client API.
     Attempts the elimination of an existing domain in OpenStack, an existing user in both OpenStack
-    and the local model database and an existing company in the local mmodel database.
+    and the local model database and an existing company in the local model database.
     
     Args:
-        keystone_client: Openstack Keystone authorization client.
+        keystone_client: OpenStack KeyStone authorization client.
         user_id: (string) ID at the local model database for the user
     """
-    # Check if the user is not needed
     existing_user = User.objects.get(id=user_id)
+    
+    # Check if the user exists
+    if existing_user is None:
+        raise IllegalDeletion("User with id %s not found.",user_id)
+    
+    # Check if the user is not needed
     if existing_user.account_main_user:
-        raise Exception("This user cannot be removed as long as it be the main user of an account.")
+        raise IllegalDeletion("This user cannot be removed as long as it be the main user of an account.")
     
     companies_with_this_user = Company.objects.filter(created_by_id=existing_user.id)
     if len(companies_with_this_user) > 0:
-        raise Exception("This user cannot be removed as long as it was used to create a company.")
-    #TODO: implement    
-    # Remove from local model database
-    
+        raise IllegalDeletion("This user cannot be removed as long as it was used to create a company.")
+   
     # Remove from OpenStack
+    if existing_user.external_id is not None:
+        keystone_client.users.delete(existing_user.external_id)
+    # Remove from local model database
+    existing_user.delete()
   
 class AddUserForm(forms.Form):
     """Creates a new Openstack user record.

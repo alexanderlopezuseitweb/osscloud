@@ -1,5 +1,5 @@
 import sys
-from datetime import datetime
+from django.utils import timezone
 from django import forms
 from oslayer.models import Company, AccessLevel
 from oslayer.services import domain 
@@ -44,7 +44,7 @@ def add(keystone_client, fields_data):
                                          billing_contact_phone=fields_data['billing_contact_phone'],
                                          technical_contact_name=fields_data['technical_contact_name'],
                                          technical_contact_email=fields_data['technical_contact_email'],
-                                         created_by=new_model_user, created_on=datetime.now(),
+                                         created_by=new_model_user, created_on=timezone.now(),
                                          modified_by=new_model_user, access_level=al)
     return new_company
 

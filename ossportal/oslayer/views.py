@@ -5,10 +5,7 @@ from django.views import generic
 from django.views.generic.edit import UpdateView, DeleteView
 
 from .models import Company
-from services import company
-from services import domain
-from services import user
-from services import project
+from services import company, domain, user, project
 from openstack import api
 # Create your views here.
 
@@ -49,9 +46,6 @@ def project_list(request):
     except Exception as ex:
         return HttpResponse("Error: " + ex.message)
     else:
-        print("username:", request.session[api.SESSION_KEYWORD]['username'])
-        print("regions:",kc.regions.list())
-        #kc.projects.create(name='useit_project', domain='e0c9b559b31a41ceae4548ce04ef7789', description='Default project for useit domain', enabled=True, parent=None)
         return render(request, 'oslayer/project_list.html', {'project_list': kc.projects.list()})
         
 def project_detail(request, project_id):

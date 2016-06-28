@@ -19,7 +19,6 @@ class User(models.Model):
     is_confirmed = models.BooleanField(default=False, help_text="Whether the user is confirmed or not. Default is FALSE.")
     external_id = models.CharField(max_length=50, blank=True, help_text="Openstack ID for this user.")
     account_main_user = models.BooleanField(default=False, help_text="Whether the user is the main one for its Account. Default is FALSE.")
-#    account = models.ForeignKey(Account, help_text="Account to which the user belongs.")
     
     def __str__(self):
         return self.name
