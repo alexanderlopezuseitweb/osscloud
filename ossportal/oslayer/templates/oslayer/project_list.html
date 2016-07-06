@@ -5,7 +5,7 @@
 {% if project_list %}
     <ul>
     {% for project in project_list %}
-        <li><a href="{% url 'oslayer:project_detail' project.id %}">{{ project.name }} : {{ project.description }}</a></li>
+        <li><a href="{% url 'oslayer:project_edit' project.id %}">{{ project.name }} : {{ project.description }}</a></li>
     {% endfor %}
     </ul>
 {% else %}

@@ -1,8 +1,8 @@
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse_lazy
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from django.views.generic.edit import UpdateView, DeleteView
+from django.views.generic.edit import DeleteView
 
 from .models import Company
 from services import company, domain, user, project
@@ -48,7 +48,7 @@ def project_list(request):
     else:
         return render(request, 'oslayer/project_list.html', {'project_list': kc.projects.list()})
         
-def project_detail(request, project_id):
+def project_edit(request, project_id):
     """Shows details for a given project id.
     
     Args:
@@ -59,11 +59,36 @@ def project_detail(request, project_id):
     """    
     
     try:
-        kc = __get_keystone_client__(request)
+        keystone_client = __get_keystone_client__(request)
     except Exception as ex:
         return HttpResponse("Error: " + ex.message)
+        
+    instance = keystone_client.projects.get(project_id)
+    data = {
+                'name' : instance.name,
+                'description' : instance.description,
+                'enabled' : instance.enabled,
+                'domain_id' : instance.domain_id
+            }
+    # if this is a POST request, process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = project.ProjectForm(request.POST or None)
+        form.set_choices(keystone_client)
+        # check whether it is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            project.edit(keystone_client, project_id, form.cleaned_data)
+            # redirect to a new URL:
+            return render(request, 'oslayer/project_list.html', {'project_list': keystone_client.projects.list()})
+
+    # if a GET (or any other method) we'll create a form filled with the instance's data
     else:
-        return render(request, 'oslayer/project_detail.html', {'project': kc.projects.get(project_id)})
+        form = project.ProjectForm(initial=data)
+        form.set_choices(keystone_client, data)
+
+    return render(request, 'oslayer/project_edit.html', {'form': form, 'project_id':project_id})
+    
 
 def project_add(request):
     """Form to create a new project record.
@@ -76,7 +101,7 @@ def project_add(request):
     # if this is a POST request, process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = project.AddProjectForm(request.POST)
+        form = project.ProjectForm(request.POST)
         form.set_choices(keystone_client)
         # check whether it is valid:
         if form.is_valid():
@@ -87,7 +112,7 @@ def project_add(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = project.AddProjectForm()
+        form = project.ProjectForm()
         form.set_choices(keystone_client)
 
     return render(request, 'oslayer/project_form.html', {'form': form})
@@ -234,21 +259,36 @@ def company_add(request):
 
     return render(request, 'oslayer/company_form.html', {'form': form})
 
+def company_edit(request, company_id):
+    """Form to create a new company record.
+    
+    Args:
+        request: Django request containing session and data from post.
+        company_id: 
+    """
+    instance = get_object_or_404(Company, id=company_id)
+    # if this is a POST request, process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = company.EditCompanyForm(request.POST or None, instance=instance)
+        # check whether it is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            keystone_client = __get_keystone_client__(request)
+            form.save(keystone_client)
+            # redirect to a new URL:
+            return render(request, 'oslayer/company_list.html', {'company_list': Company.objects.all()})
+
+    # if a GET (or any other method) we'll create a form filled with the instance's data
+    else:
+        form = company.EditCompanyForm(instance=instance)
+
+    return render(request, 'oslayer/company_edit.html', {'form': form, 'company_id':company_id})
+
 class CompanyListView(generic.ListView):
     """Lists current companies.
     """
     model = Company
-
-class CompanyDetailView(generic.DetailView):
-    """Shows details for a given company.
-    """
-    model = Company
-    template_name = 'oslayer/company_detail.html'
-
-
-class CompanyUpdate(UpdateView):
-    model = Company
-    fields = ['name', 'description', 'active']
 
 class CompanyDelete(DeleteView):
     model = Company

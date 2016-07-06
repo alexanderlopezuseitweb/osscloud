@@ -8,7 +8,7 @@
 {% if company_list %}
     <ul>
     {% for company in company_list %}
-        <li><a href="{% url 'oslayer:company_detail' company.id %}">{{ company.name }} : {{ company.description }}</a></li>
+        <li><a href="{% url 'oslayer:company_edit' company.id %}">{{ company.name }} : {{ company.description }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
