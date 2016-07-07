@@ -10,7 +10,7 @@
 {% if user_list %}
     <ul>
     {% for user in user_list %}
-        <li><a href="{% url 'oslayer:user_detail' user.id %}">{{ user.name }} : {{ user.description }}</a></li>
+        <li><a href="{% url 'oslayer:user_edit' user.id %}">{{ user.name }} : {{ user.description }}</a></li>
     {% endfor %}
     </ul>
 {% else %}

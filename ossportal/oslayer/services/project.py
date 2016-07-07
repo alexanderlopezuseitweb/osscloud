@@ -38,6 +38,7 @@ class ProjectForm(forms.Form):
         
         Args:
             keystone_client: Openstack Keystone authorization client.
+            data: (dict) data values from the stored record.
         """
         initial = None
         if data is not None:

@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from django.views.generic.edit import DeleteView
 
-from .models import Company
+from .models import Company, User
 from services import company, domain, user, project
 from openstack import api
 # Create your views here.
@@ -73,7 +73,7 @@ def project_edit(request, project_id):
     # if this is a POST request, process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = project.ProjectForm(request.POST or None)
+        form = project.ProjectForm(request.POST)
         form.set_choices(keystone_client)
         # check whether it is valid:
         if form.is_valid():
@@ -126,12 +126,7 @@ def user_list(request):
         HttpResponse 
     """
     
-    try:
-        kc = __get_keystone_client__(request)
-    except Exception as ex:
-        return HttpResponse("Error: " + ex.message)
-    else:
-        return render(request, 'oslayer/user_list.html', {'user_list': kc.users.list()})
+    return render(request, 'oslayer/user_list.html', {'user_list': User.objects.all()})
         
 def user_detail(request, user_id):
     """Shows details for a given user id.
@@ -150,6 +145,51 @@ def user_detail(request, user_id):
     else:
         return render(request, 'oslayer/user_detail.html', {'user': kc.users.get(user_id)})
 
+def user_edit(request, user_id):
+    """Modifies an existing user associated to a given domain.
+    
+    Args:
+        request: Django request containing session.
+        user_id (int): sequence ID for the user.
+    Returns:
+        HttpResponse
+    """
+    try:
+        keystone_client = __get_keystone_client__(request)
+    except Exception as ex:
+        return HttpResponse("Error: " + ex.message)
+    
+    # if this is a POST request, process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = user.UserForm(request.POST)
+        form.set_choices(keystone_client)
+        # check whether it is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            user.edit(keystone_client, user_id, form.cleaned_data)
+            # redirect to a new URL:
+            return render(request, 'oslayer/user_list.html', {'user_list': User.objects.all()})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        instance = User.objects.get(id=user_id)
+        data = {
+                'name' : instance.name,
+                'password' : instance.password,
+                'email' : instance.email,
+#                 'description' : instance.description,
+#                 'enabled' : instance.enabled,
+#                 'domain_id' : instance.domain_id,
+#                 'default_project_id' : instance.default_project_id,
+                'account_main_user' : instance.account_main_user                
+                }
+        form = user.UserForm(initial=data)
+        form.set_choices(keystone_client, data)
+
+    return render(request, 'oslayer/user_edit.html', {'form': form})    
+
+
 def user_add(request):
     """Creates a new user associated to a given domain.
     
@@ -162,7 +202,7 @@ def user_add(request):
     # if this is a POST request, process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = user.AddUserForm(request.POST)
+        form = user.UserForm(request.POST)
         form.set_choices(keystone_client)
         # check whether it is valid:
         if form.is_valid():
@@ -173,7 +213,7 @@ def user_add(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = user.AddUserForm()
+        form = user.UserForm()
         form.set_choices(keystone_client)
 
     return render(request, 'oslayer/user_form.html', {'form': form})    
