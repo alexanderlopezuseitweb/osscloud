@@ -1,0 +1,9 @@
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'oslayer/style.css' %}" />
+<h2>Open Source Storage</h2>
+<ul>
+	<li><a href="{% url 'oslayer:project_list' %}">projects</a></li>
+	<li><a href="{% url 'oslayer:user_list' %}">users</a></li>
+	<li><a href="{% url 'oslayer:domain_list' %}">domains</a></li>
+	<li><a href="{% url 'oslayer:company_list' %}">companies</a></li>
+</ul>

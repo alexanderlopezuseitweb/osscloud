@@ -1,3 +1,6 @@
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'oslayer/style.css' %}" />
+<h2>Projects</h2>
 <form action="{% url 'oslayer:project_add' %}" method="get">
 	<input type="submit" value="Add" />
 </form>

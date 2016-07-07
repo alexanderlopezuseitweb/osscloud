@@ -1,9 +1,9 @@
-
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'oslayer/style.css' %}" />
+<h2>Companies</h2>
 <form action="{% url 'oslayer:company_add' %}" method="get">
 	<input type="submit" value="Add" />
 </form>
-
-<h2>Existing companies</h2>
 
 {% if company_list %}
     <ul>

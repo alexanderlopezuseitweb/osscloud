@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse_lazy
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views import generic
 from django.views.generic.edit import DeleteView
 
@@ -30,7 +30,7 @@ def __get_keystone_client__(request):
     return kc        
     
 def index(request):
-    return HttpResponse("Hello, world. You're at the oslayer index.")
+    return render(request, 'oslayer/index.html')
 
 def project_list(request):
     """Lists current projects available in OpenSTack.
@@ -169,25 +169,28 @@ def user_edit(request, user_id):
             # process the data in form.cleaned_data as required
             user.edit(keystone_client, user_id, form.cleaned_data)
             # redirect to a new URL:
-            return render(request, 'oslayer/user_list.html', {'user_list': User.objects.all()})
+            return redirect('/oslayer/user/')
 
-    # if a GET (or any other method) we'll create a blank form
+    # if a GET (or any other method) we'll create a form filled with the instance's data
     else:
         instance = User.objects.get(id=user_id)
+        ks_user = keystone_client.users.get(instance.external_id)
         data = {
                 'name' : instance.name,
                 'password' : instance.password,
                 'email' : instance.email,
-#                 'description' : instance.description,
-#                 'enabled' : instance.enabled,
-#                 'domain_id' : instance.domain_id,
-#                 'default_project_id' : instance.default_project_id,
-                'account_main_user' : instance.account_main_user                
+                'description' : ks_user.description,
+                'enabled' : ks_user.enabled,
+                'domain_id' : ks_user.domain_id,
+                'default_project_id' : ks_user.default_project_id,
+                'account_main_user' : instance.account_main_user,
+                'security_question_answer' : instance.security_question_answer,
+                'security_question' : instance.security_question                
                 }
         form = user.UserForm(initial=data)
         form.set_choices(keystone_client, data)
 
-    return render(request, 'oslayer/user_edit.html', {'form': form})    
+    return render(request, 'oslayer/user_edit.html', {'form': form, 'user_id':user_id})    
 
 
 def user_add(request):
@@ -209,7 +212,7 @@ def user_add(request):
             # process the data in form.cleaned_data as required
             user.add(keystone_client, form.cleaned_data)
             # redirect to a new URL:
-            return render(request, 'oslayer/user_list.html', {'user_list': keystone_client.users.list()})
+            return redirect('/oslayer/user/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -267,7 +270,7 @@ def domain_add(request):
             keystone_client = __get_keystone_client__(request)
             domain.add(keystone_client, form.cleaned_data)
             # redirect to a new URL:
-            return render(request, 'oslayer/domain_list.html', {'domain_list': keystone_client.domains.list()})
+            return redirect('/oslayer/domain/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -291,7 +294,7 @@ def company_add(request):
             keystone_client = __get_keystone_client__(request)
             form.save(keystone_client)
             # redirect to a new URL:
-            return render(request, 'oslayer/company_list.html', {'company_list': Company.objects.all()})
+            return redirect('/oslayer/company/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -317,7 +320,7 @@ def company_edit(request, company_id):
             keystone_client = __get_keystone_client__(request)
             form.save(keystone_client)
             # redirect to a new URL:
-            return render(request, 'oslayer/company_list.html', {'company_list': Company.objects.all()})
+            return redirect('/oslayer/company/')
 
     # if a GET (or any other method) we'll create a form filled with the instance's data
     else:
@@ -332,4 +335,4 @@ class CompanyListView(generic.ListView):
 
 class CompanyDelete(DeleteView):
     model = Company
-    success_url = reverse_lazy('company-list')
+    success_url = reverse_lazy('company_list')

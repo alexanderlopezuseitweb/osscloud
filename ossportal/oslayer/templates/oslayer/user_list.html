@@ -1,11 +1,9 @@
-<h2>New user</h2>
-
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'oslayer/style.css' %}" />
+<h2>Users</h2>
 <form action="{% url 'oslayer:user_add' %}" method="get">
-	<input type="submit" value="Crear" />
+	<input type="submit" value="Add" />
 </form>
-
-
-<h2>Existing users</h2>
 
 {% if user_list %}
     <ul>

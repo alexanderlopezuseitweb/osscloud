@@ -14,7 +14,7 @@ urlpatterns = [
     url(r'^domain\/$', views.domain_list, name='domain_list'),
     url(r'^domain\/add$', views.domain_add, name='domain_add'),
     url(r'^domain\/(?P<domain_id>[a-z0-9]+)\/$', views.domain_detail, name='domain_detail'),
-    url(r'^company\/$', views.CompanyListView.as_view()),
+    url(r'^company\/$', views.CompanyListView.as_view(), name='company_list'),
     url(r'^company\/add$', views.company_add, name='company_add'),
     url(r'^company\/(?P<company_id>[0-9]+)\/$', views.company_edit, name='company_edit'),
 #    url(r'^company\/(?P<pk>[0-9]+)\/delete$', views.CompanyDelete.as_view(), name='company-delete'),

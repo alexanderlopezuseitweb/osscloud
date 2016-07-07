@@ -1,6 +1,8 @@
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'oslayer/style.css' %}" />
 <h1>Modify an existing user</h1>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-<form action="{% url 'oslayer:user_edit user_id' %}" method="post">
+<form action="{% url 'oslayer:user_edit' user_id %}" method="post">
 	{% csrf_token %}
 	<table>
 	{{ form.as_table }}

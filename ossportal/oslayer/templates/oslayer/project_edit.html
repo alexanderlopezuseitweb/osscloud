@@ -1,3 +1,5 @@
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'oslayer/style.css' %}" />
 <h2>Modify existing project</h2>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 <form action="{% url 'oslayer:project_edit' project_id %}" method="post">

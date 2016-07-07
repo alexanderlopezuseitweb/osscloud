@@ -33,6 +33,8 @@ def add(keystone_client, fields_data):
     domain_id = fields_data['domain_id']
     default_project_id = fields_data['default_project_id']
     account_main_user = fields_data['account_main_user']
+    security_question_answer = fields_data['security_question_answer']
+    security_question = fields_data['security_question']
 
     try:
         new_user = keystone_client.users.create(name=name, description=description, enabled=enabled, domain=domain_id, 
@@ -43,7 +45,9 @@ def add(keystone_client, fields_data):
     else:
         #Successful creation in OpenStack, proceed to local model 
         return User.objects.create(name=name, password=password, email=email, created_on=timezone.now(),
-                                     account_main_user=account_main_user , external_id=new_user.id)
+                                     account_main_user=account_main_user , external_id=new_user.id,
+                                     security_question_answer=security_question_answer, 
+                                     security_question=security_question)
 
 def edit(keystone_client, user_id, fields_data):
     """Attempts the creation in Openstack and then in the local database model.
@@ -57,24 +61,35 @@ def edit(keystone_client, user_id, fields_data):
     
     # Get data to update 
     name = fields_data['name']
-    password = fields_data['password']
     email = fields_data['email']
     description = fields_data['description']
     enabled = fields_data['enabled']
-    domain_id = fields_data['domain_id']
     default_project_id = fields_data['default_project_id']
     account_main_user = fields_data['account_main_user']
+    security_question_answer = fields_data['security_question_answer']
+    security_question = fields_data['security_question']
+    if len(fields_data['password']) > 0:
+        password = fields_data['password']
+    else:
+        password = None
 
     try:
         keystone_client.users.update(existing_user.external_id, name=name, description=description, 
-                                     enabled=enabled, domain=domain_id, default_project=default_project_id, 
-                                     password=password, email=email)
+                                     enabled=enabled, password=password, default_project=default_project_id, 
+                                     email=email)
     except Exception as ex:
         exc_type, exc_obj, exc_tb = sys.exc_info() #@UnusedVariable
         raise Exception("Error: " + str(exc_type) + " - " + ex.message)
     else:
         # Successful update in OpenStack, proceed to local model 
-        existing_user.update(name=name, password=password, email=email, account_main_user=account_main_user)
+        existing_user.name=name
+        existing_user.email=email
+        existing_user.account_main_user=account_main_user
+        existing_user.security_question_answer=security_question_answer
+        existing_user.security_question=security_question
+        if password is not None:
+            existing_user.password=password
+        existing_user.save()
 
 def delete(keystone_client, user_id):
     """Request the company elimination from openstack through the client API.
@@ -110,9 +125,15 @@ class UserForm(forms.Form):
     """
     name = forms.CharField(label='Name', max_length=50, help_text='Domain name')
     description = forms.CharField(label='Description', widget=forms.Textarea, required=False, max_length=200, help_text='Short description for this user')
-    password = forms.CharField(label='Password', widget=forms.PasswordInput, max_length=200, help_text='Default password for this user')
+    password = forms.CharField(label='Password', widget=forms.PasswordInput, required=False, max_length=200, help_text='Default password for this user')
     email = forms.EmailField(label='E-mail', max_length=50, help_text='Contact email for this user')
+    security_question = forms.CharField(label='Security question', max_length=100, required=False, 
+                                        help_text="Security question to be used on the event of password lose or user ID lose.")   
+    security_question_answer = forms.CharField(label='Answer', max_length=100, required=False,
+                                               help_text="Answer to the security question to be used on the event of password lose or user ID lose.") 
+    
     enabled = forms.BooleanField(label='Is enabled?', required=False, help_text='Check if the new user is enabled by default')
+    account_main_user = forms.BooleanField(label='Is the main user of its account?', required=False, help_text='Check if this is the main user of its account')
     
     def set_choices(self, keystone_client, data=None):
         """Request the domains list to OpenStack through the client API.
@@ -127,14 +148,19 @@ class UserForm(forms.Form):
                        'domain_id':data['domain_id'], 
                        'default_project_id':data['default_project_id']
                        }
+            # Prevent that the domain be changed, which is forbidden by Openstack.
+            attrs={'disabled': 'disabled'}
+        else:
+            attrs=None
             
         choices = [(d.id, d.name) for d in keystone_client.domains.list()]
-        domain_id = forms.ChoiceField(label='Parent domain', widget=forms.Select, choices=choices, 
-                                      initial=initial, required=False, help_text='Domain to which belongs this user')
+        domain_id = forms.ChoiceField(label='Parent domain', widget=forms.Select(attrs=attrs), choices=choices, 
+                                      initial=initial, required=False, help_text='Domain to which this user belongs')
         self.fields['domain_id'] =  domain_id
         
         choices_projects = [(p.id, p.name) for p in keystone_client.projects.list()]
         default_project_id = forms.ChoiceField(label='Default project', widget=forms.Select, 
-                                               choices=choices_projects, initial=initial, required=False, help_text='Project under which this user will be created by default')
+                                               choices=choices_projects, initial=initial, required=False, 
+                                               help_text='Project under which this user will be created by default')
         self.fields['default_project_id'] =  default_project_id
         
