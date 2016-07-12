@@ -22,7 +22,7 @@ class User(models.Model):
         return self.name
 
 class AuditInfo(models.Model):
-    """Common fields to models intended to be used to audit transactions on records
+    """Common fields to models intended to be used to audit transactions on records.
     """
     created_on = models.DateTimeField(auto_now_add=False, help_text="Date of creation.")
     created_by = models.ForeignKey(User, related_name='+', help_text="User who created the record.")
