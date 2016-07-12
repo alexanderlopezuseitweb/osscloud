@@ -7,6 +7,9 @@ from django.views.generic.edit import DeleteView
 from .models import Company, User
 from services import company, domain, user, project
 from openstack import api
+from confluence import Api
+from django.template.defaulttags import register
+from jira.client import JIRA
 # Create your views here.
 
 def __get_keystone_client__(request):
@@ -336,3 +339,54 @@ class CompanyListView(generic.ListView):
 class CompanyDelete(DeleteView):
     model = Company
     success_url = reverse_lazy('company_list')
+    
+
+def forums_space_list(request):
+    """Lists space confluence
+    """
+    wiki_url = "https://useit-oss.atlassian.net/wiki"  # your wiki url
+    user, pw = "admin", "champion25"  # your credentials
+    api = Api(wiki_url, user, pw)
+    
+    spaces=api.listspaces()
+    return render(request, 'oslayer/forum_space_list.html', {'spaces':spaces})
+    
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
+
+def forums_space_list_pages(request,space_key):
+    """View Space with pages - confluence
+    """
+    wiki_url = "https://useit-oss.atlassian.net/wiki"  # your wiki url
+    user, pw = "admin", "champion25"  # your credentials
+    api = Api(wiki_url, user, pw)
+    pages=api.listpages(space_key)
+    return render(request, 'oslayer/forum_space_list_pages.html', {'pages':pages})
+
+class ApiJira:
+    server = "https://useit-oss.atlassian.net"
+    user, pw = "admin", "champion25"
+    """Method for connect with default admin oss
+    """
+    def admin_connect_to_jira(self):
+        jira_options = { 'server': self.server}
+        try:
+            jira = JIRA(options=jira_options, basic_auth=(self.user, self.pw))
+        except Exception as e:
+            jira = None
+        
+        return jira
+    
+    """Method for connect with users global
+    """
+    def user_connect_to_jira(self,user,pw):
+        jira_options = { 'server': self.server}
+        try:
+            jira = JIRA(options=jira_options, basic_auth=(user,pw))
+        except Exception as e:
+            jira = None
+        
+        return jira
+        
+    

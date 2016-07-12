@@ -1,0 +1,15 @@
+<h2>Forums - Confluence</h2>
+
+<a href="{% url 'oslayer:forums_space_list' %}">volver</a>
+
+<h2>All Pages</h2>
+
+{% if pages %}
+	<ul>
+	  {% for page in pages %}
+	  	<li><a href="{{page.0.url}}" target="_blank">{{page.0.title}}</a></li>
+	  {% endfor %}
+	</ul>
+{% else %}
+    <p>No pages are available.</p>
+{% endif %}

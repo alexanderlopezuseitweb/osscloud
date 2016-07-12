@@ -1,0 +1,16 @@
+
+<h2>Forums - Confluence</h2>
+
+
+
+<h2>All Space</h2>
+
+{% if spaces %}
+	<ul>
+	  {% for space in spaces %}
+	     <li><a href="{% url 'oslayer:forums_space_list_pages' space.key %}">{{space.name}}</a></li>
+	  {% endfor %}
+	</ul>
+{% else %}
+    <p>No spaces are available.</p>
+{% endif %}
