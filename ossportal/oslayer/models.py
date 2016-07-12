@@ -2,8 +2,6 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-from .apps import OSLayerConfig
-
 # Create your models here.
 class User(models.Model):
     """Login accesses for people related to an account in order to work in projects.
@@ -22,9 +20,6 @@ class User(models.Model):
     
     def __str__(self):
         return self.name
-    
-    class Meta:
-        db_table = OSLayerConfig.name + "_users"
 
 class AuditInfo(models.Model):
     """Common fields to models intended to be used to audit transactions on records.
@@ -45,9 +40,6 @@ class AccessLevel(models.Model):
 
     def __str__(self):
         return self.name
-    
-    class Meta:
-        db_table = OSLayerConfig.name + "_access_levels"
 
 class Company(AuditInfo):
     """Entity to be billed for products and services.
@@ -73,7 +65,6 @@ class Company(AuditInfo):
 
     class Meta:
         verbose_name_plural = 'companies'
-        db_table = OSLayerConfig.name + "_companies"
         
 class Setting(models.Model):
     """Configuration settings.
@@ -84,6 +75,3 @@ class Setting(models.Model):
     
     def __str__(self):
         return self.id
-
-    class Meta:
-        db_table = OSLayerConfig.name + "_settings"
