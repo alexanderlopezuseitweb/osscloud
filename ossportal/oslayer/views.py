@@ -4,8 +4,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views import generic
 from django.views.generic.edit import DeleteView
 
-from .models import Company, User
-from services import company, domain, user, project
+from models import Company, User, Country, State, City, Group
+from services import company, domain, user, project, country, state, city, group
 from openstack import api
 # Create your views here.
 
@@ -336,3 +336,237 @@ class CompanyListView(generic.ListView):
 class CompanyDelete(DeleteView):
     model = Company
     success_url = reverse_lazy('company_list')
+
+#Created by Alexander Lopez
+def country_add(request):
+    """Form to create a new country record.
+     
+    Args:
+        request: Django request containing session and data from post.
+    """
+    # if this is a POST request, process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = country.AddCountryForm(request.POST)
+        # check whether it is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            form.save()
+            # redirect to a new URL:
+            return redirect('/oslayer/country/')
+ 
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = country.AddCountryForm()
+ 
+    return render(request, 'oslayer/country_form.html', {'form': form})
+ 
+def country_edit(request, country_id):
+    """Form to edit a country record.
+     
+    Args:
+        request: Django request containing session and data from post.
+        country_id: 
+    """
+    instance = get_object_or_404(Country, id=country_id)
+    # if this is a POST request, process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = country.EditCountryForm(request.POST or None, instance=instance)
+        
+        # check whether it is valid:  
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            form.save()
+            # redirect to a new URL:
+            return redirect('/oslayer/country/')
+ 
+    # if a GET (or any other method) we'll create a form filled with the instance's data
+    else:
+        form = country.EditCountryForm(instance=instance)
+ 
+    return render(request, 'oslayer/country_edit.html', {'form': form, 'country_id':country_id})
+ 
+class CountryListView(generic.ListView):
+    """Lists current countries.
+    """
+    model = Country
+ 
+class CountryDelete(DeleteView):
+    model = Country
+    success_url = '/oslayer/country/'
+    #success_url = reverse_lazy('country_list')
+
+def state_add(request):
+    """Form to create a new state record.
+     
+    Args:
+        request: Django request containing session and data from post.
+    """
+    # if this is a POST request, process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = state.AddStateForm(request.POST)
+        # check whether it is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            form.save()
+            # redirect to a new URL:
+            return redirect('/oslayer/state/')
+ 
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = state.AddStateForm()
+ 
+    return render(request, 'oslayer/state_form.html', {'form': form})
+ 
+def state_edit(request, state_id):
+    """Form to edit a country record.
+     
+    Args:
+        request: Django request containing session and data from post.
+        country_id: 
+    """
+    instance = get_object_or_404(State, id=state_id)
+    # if this is a POST request, process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = state.EditStateForm(request.POST or None, instance=instance)
+        # check whether it is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            form.save()
+            # redirect to a new URL:
+            return redirect('/oslayer/state/')
+ 
+    # if a GET (or any other method) we'll create a form filled with the instance's data
+    else:
+        form = state.EditStateForm(instance=instance)
+ 
+    return render(request, 'oslayer/state_edit.html', {'form': form, 'state_id':state_id})
+ 
+class StateListView(generic.ListView):
+    """Lists current states.
+    """
+    model = State
+ 
+class StateDelete(DeleteView):
+    model = State
+    success_url = '/oslayer/state/'
+    #success_url = reverse_lazy('state_list',kwargs={},current_app='oslayer')
+
+def city_add(request):
+    """Form to create a new city record.
+     
+    Args:
+        request: Django request containing session and data from post.
+    """
+    # if this is a POST request, process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = city.AddCityForm(request.POST)
+        # check whether it is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            form.save()
+            # redirect to a new URL:
+            return redirect('/oslayer/city/')
+ 
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = city.AddCityForm()
+ 
+    return render(request, 'oslayer/city_form.html', {'form': form})
+ 
+def city_edit(request, city_id):
+    """Form to edit a city record.
+     
+    Args:
+        request: Django request containing session and data from post.
+        country_id: 
+    """
+    instance = get_object_or_404(City, id=city_id)
+    # if this is a POST request, process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = city.EditCityForm(request.POST or None, instance=instance)
+        # check whether it is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            form.save()
+            # redirect to a new URL:
+            return redirect('/oslayer/city/')
+ 
+    # if a GET (or any other method) we'll create a form filled with the instance's data
+    else:
+        form = city.EditCityForm(instance=instance)
+ 
+    return render(request, 'oslayer/city_edit.html', {'form': form, 'city_id':city_id})
+ 
+class CityListView(generic.ListView):
+    """Lists current cities.
+    """
+    model = City
+ 
+class CityDelete(DeleteView):
+    model = City
+    success_url = '/oslayer/city/'
+    #success_url = reverse_lazy('city_list')
+
+def group_add(request):
+    """Form to create a new group record.
+     
+    Args:
+        request: Django request containing session and data from post.
+    """
+    # if this is a POST request, process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = group.AddGroupForm(request.POST)
+        # check whether it is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            form.save()
+            # redirect to a new URL:
+            return redirect('/oslayer/group/')
+ 
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = group.AddGroupForm()
+ 
+    return render(request, 'oslayer/group_form.html', {'form': form})
+ 
+def group_edit(request, group_id):
+    """Form to edit a city record.
+     
+    Args:
+        request: Django request containing session and data from post.
+        country_id: 
+    """
+    instance = get_object_or_404(Group, id=group_id)
+    # if this is a POST request, process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = group.EditGroupForm(request.POST or None, instance=instance)
+        # check whether it is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            form.save()
+            # redirect to a new URL:
+            return redirect('/oslayer/group/')
+ 
+    # if a GET (or any other method) we'll create a form filled with the instance's data
+    else:
+        form = group.EditGroupForm(instance=instance)
+ 
+    return render(request, 'oslayer/group_edit.html', {'form': form, 'group_id':group_id})
+ 
+class GroupListView(generic.ListView):
+    """Lists current cities.
+    """
+    model = Group
+ 
+class GroupDelete(DeleteView):
+    model = Group
+    success_url = '/oslayer/group/'
+    #success_url = reverse_lazy('group_list')

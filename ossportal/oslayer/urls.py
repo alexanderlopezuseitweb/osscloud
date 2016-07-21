@@ -18,4 +18,22 @@ urlpatterns = [
     url(r'^company\/add$', views.company_add, name='company_add'),
     url(r'^company\/(?P<company_id>[0-9]+)\/$', views.company_edit, name='company_edit'),
 #    url(r'^company\/(?P<pk>[0-9]+)\/delete$', views.CompanyDelete.as_view(), name='company-delete'),
+    #Added by Alexander Lopez
+    url(r'^group\/$', views.GroupListView.as_view(), name='group_list'),
+    url(r'^group\/add$', views.group_add, name='group_add'),
+    url(r'^group\/(?P<group_id>[0-9]+)\/$', views.group_edit, name='group_edit'),
+    url(r'^state\/delete_group\/(?P<pk>[0-9]+)\/$', views.GroupDelete.as_view(), name='group_delete'),
+    url(r'^country\/$', views.CountryListView.as_view(), name='country_list'),
+    url(r'^country\/add$', views.country_add, name='country_add'),
+    url(r'^country\/(?P<country_id>[0-9]+)\/$', views.country_edit, name='country_edit'),
+    url(r'^state\/delete_country\/(?P<pk>[0-9]+)\/$', views.CountryDelete.as_view(), name='country_delete'),
+    url(r'^state\/$', views.StateListView.as_view(), name='state_list'),
+    url(r'^state\/add$', views.state_add, name='state_add'),
+    url(r'^state\/(?P<state_id>[0-9]+)\/$', views.state_edit, name='state_edit'),
+    url(r'^state\/delete_state\/(?P<pk>[0-9]+)\/$', views.StateDelete.as_view(), name='state_delete'),
+    url(r'^city\/$', views.CityListView.as_view(), name='city_list'),
+    url(r'^city\/add$', views.city_add, name='city_add'),
+    url(r'^city\/(?P<city_id>[0-9]+)\/$', views.city_edit, name='city_edit'),
+    url(r'^state\/delete_city\/(?P<pk>[0-9]+)\/$', views.CityDelete.as_view(), name='city_delete'),
+
 ]

@@ -1,0 +1,8 @@
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'oslayer/style.css' %}" />
+<h2>Delete Country</h2>
+
+<form method="post">{% csrf_token %}
+    Are you sure you want to delete the country "{{ object }}" ?
+    <input type="submit" value="Delete" />
+</form>

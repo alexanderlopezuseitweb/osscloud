@@ -1,0 +1,18 @@
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'oslayer/style.css' %}" />
+<h2>Countries</h2>
+<form action="{% url 'oslayer:country_add' %}" method="get">
+	<input type="submit" value="Add" />
+</form>
+
+{% if country_list %}
+    <ul>
+    {% for country in country_list %}
+        <li><a href="{% url 'oslayer:country_edit' country.id %}">{{ country.name }}</a>
+        	        - <a href="{% url 'oslayer:country_delete' country.id %}">delete</a>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No countries are available.</p>
+{% endif %}
