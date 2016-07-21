@@ -5,11 +5,11 @@ from django.views import generic
 from django.views.generic.edit import DeleteView
 
 from .models import Company, User
-from services import company, domain, user, project
+from services import company, domain, user, project,admin_jira
 from openstack import api
 from confluence import Api
 from django.template.defaulttags import register
-from jira.client import JIRA
+from .models import Setting
 # Create your views here.
 
 def __get_keystone_client__(request):
@@ -364,29 +364,20 @@ def forums_space_list_pages(request,space_key):
     pages=api.listpages(space_key)
     return render(request, 'oslayer/forum_space_list_pages.html', {'pages':pages})
 
-class ApiJira:
-    server = "https://useit-oss.atlassian.net"
-    user, pw = "admin", "champion25"
-    """Method for connect with default admin oss
+# get projects and tickets . current user
+def tickets_list(request):
+    """View tickets
     """
-    def admin_connect_to_jira(self):
-        jira_options = { 'server': self.server}
-        try:
-            jira = JIRA(options=jira_options, basic_auth=(self.user, self.pw))
-        except Exception as e:
-            jira = None
-        
-        return jira
+    jira=admin_jira.admin_connect_to_jira()
+    #jira = admin_jira.user_connect_to_jira('user','pass')
+    projects=jira.projects()
+    issues = jira.search_issues('assignee = currentUser() order by priority desc', maxResults=20,fields='description,issueKey,project,status,priority,summary')
+    link=admin_jira.get_server()
+    return render(request, 'oslayer/tickets_list.html', {'projects':projects,'issues':issues,'link':link})
+
     
-    """Method for connect with users global
-    """
-    def user_connect_to_jira(self,user,pw):
-        jira_options = { 'server': self.server}
-        try:
-            jira = JIRA(options=jira_options, basic_auth=(user,pw))
-        except Exception as e:
-            jira = None
-        
-        return jira
-        
+    
+    
+    
+    
     

@@ -1,4 +1,5 @@
 django
 PyMySQL
 python-openstackclient
-jira
+jira==1.0.7
+confluence-py

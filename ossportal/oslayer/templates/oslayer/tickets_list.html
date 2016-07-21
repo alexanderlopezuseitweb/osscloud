@@ -1,0 +1,25 @@
+
+<h1>Tickets all</h1>
+
+<h3>Your Projects</h3>
+{% for project in projects %}
+    <li>{{ project }}</li>
+{% endfor %}
+
+<h3>Your Open Tickets</h3>
+
+{% for issue in issues %}
+    <li>
+    	<b>{{ issue.fields.summary }}</b><br>
+    	<ul>
+    		<ol><b>Key</b> {{issue.key}}</ol>
+    		<ol><b>Description:</b> {{ issue.fields.description }}</ol>
+    		<ol><b>Project:</b> {{issue.fields.project}}</ol>
+    		<ol><b>Status:</b> {{issue.fields.status}}</ol>
+    		<ol><b>Priority:</b> {{issue.fields.priority}}</ol>
+    	</ul>	
+    </li>
+{% endfor %}
+
+
+<a href="{{link}}">Ir a administrar</a>

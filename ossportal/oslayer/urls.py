@@ -20,4 +20,5 @@ urlpatterns = [
 #    url(r'^company\/(?P<pk>[0-9]+)\/delete$', views.CompanyDelete.as_view(), name='company-delete'),
     url(r'^forums\/$', views.forums_space_list, name='forums_space_list'),
     url(r'^forums\/(?P<space_key>[a-zA-Z0-9]+)\/pages$', views.forums_space_list_pages, name='forums_space_list_pages'),
+    url(r'^tickets\/$', views.tickets_list, name='tickets_list')
 ]
