@@ -6,13 +6,26 @@
 </form>
 
 {% if city_list %}
-    <ul>
+    <table>
     {% for city in city_list %}
-        <li><a href="{% url 'oslayer:city_edit' city.id %}">{{ city.name }}</a>
-        - <a href="{% url 'oslayer:city_delete' city.id %}">delete</a>
-        </li>
+    	<tr>
+    		<td>
+    			<ul>
+    				<li><a href="{% url 'oslayer:city_edit' city.id %}">{{ city.name }}</a></li>
+    			</ul>
+    		</td>
+    		<td>
+    			<ul class="list-unstyled">
+    				<li>
+    					<form action="{% url 'oslayer:city_delete' city.id %}" method="get">
+							<input type="submit" value="Delete" />
+						</form>
+    				</li>
+    			</ul>
+    		</td>
+    	</tr>
     {% endfor %}
-    </ul>
+    </table>
 {% else %}
     <p>No cities are available.</p>
 {% endif %}

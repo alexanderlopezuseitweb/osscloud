@@ -6,13 +6,26 @@
 </form>
 
 {% if state_list %}
-    <ul>
+	<table>
     {% for state in state_list %}
-        <li><a href="{% url 'oslayer:state_edit' state.id %}">{{ state.name }}</a>
-            - <a href="{% url 'oslayer:state_delete' state.id %}">delete</a>
-        </li>
+    	<tr>
+    		<td>
+    			<ul>
+    				<li><a href="{% url 'oslayer:state_edit' state.id %}">{{ state.name }}</a></li>
+    			</ul>
+    		</td>
+    		<td>
+    			<ul class="list-unstyled">
+    				<li>
+    					<form action="{% url 'oslayer:state_delete' state.id %}" method="get">
+							<input type="submit" value="Delete" />
+						</form>
+    				</li>
+    			</ul>
+    		</td>
+    	</tr>
     {% endfor %}
-    </ul>
+    </table>
 {% else %}
     <p>No states are available.</p>
 {% endif %}

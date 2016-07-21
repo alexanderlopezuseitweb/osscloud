@@ -2,3 +2,4 @@ h1, h2 {color:orange}
 body {font-family:sans-serif}
 .helptext {font-style: italic; color:gray; font-size:small}
 th {text-align:right; vertical-align:top}
+.list-unstyled {list-style-type: none;}

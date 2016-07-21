@@ -6,13 +6,26 @@
 </form>
 
 {% if group_list %}
-    <ul>
+    <table>
     {% for group in group_list %}
-        <li><a href="{% url 'oslayer:group_edit' group.id %}">{{ group.name }}</a>
-        - <a href="{% url 'oslayer:group_delete' group.id %}">delete</a>
-        </li>
+    	<tr>
+    		<td>
+				<ul>
+    				<li><a href="{% url 'oslayer:group_edit' group.id %}">{{ group.name }}</a></li>
+				</ul>
+    		</td>
+    		<td>
+    			<ul class="list-unstyled">
+	    			<li>
+	    				<form action="{% url 'oslayer:group_delete' group.id %}" method="get">
+							<input type="submit" value="Delete" />
+						</form>
+	    			</li>
+    			</ul>
+    		</td>
+    	</tr>
     {% endfor %}
-    </ul>
+    </table>
 {% else %}
     <p>No groups are available.</p>
 {% endif %}

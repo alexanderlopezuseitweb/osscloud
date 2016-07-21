@@ -6,13 +6,26 @@
 </form>
 
 {% if country_list %}
-    <ul>
+    <table>
     {% for country in country_list %}
-        <li><a href="{% url 'oslayer:country_edit' country.id %}">{{ country.name }}</a>
-        	        - <a href="{% url 'oslayer:country_delete' country.id %}">delete</a>
-        </li>
+    	<tr>
+	    	<td>
+		    	<ul>
+			        <li><a href="{% url 'oslayer:country_edit' country.id %}">{{ country.name }}</a></li>
+		        </ul>
+	        </td>
+	        <td>
+	        	<ul class="list-unstyled">
+		        	<li>
+			        	<form action="{% url 'oslayer:country_delete' country.id %}" method="get">
+							<input type="submit" value="Delete" />
+						</form>
+		        	</li>
+	        	</ul>
+	        </td>
+        </tr>
     {% endfor %}
-    </ul>
+    </table>
 {% else %}
     <p>No countries are available.</p>
 {% endif %}
